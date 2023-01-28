@@ -1,4 +1,45 @@
 #!/bin/bash
+
+# Check if Python 3 is installed
+if ! command -v python3 &> /dev/null 
+then
+    # If not, install it
+    echo "Python3 is not found, installing..."
+    sudo apt-get update
+    sudo apt-get install -y python3.11
+fi
+
+# Check if pip is installed
+if ! command -v pip3 &> /dev/null 
+then
+    # If not, install it
+    echo "pip3 is not found, installing..."
+    sudo apt-get install -y python3-pip
+fi
+
+# Check if pip setuptools wheel are installed
+if ! pip3 freeze | grep -q setuptools || ! pip3 freeze | grep -q wheel || ! pip3 pip | grep -q pip 
+then
+    # If not, install them
+    echo "setuptools and wheel, pip are not found, installing..."
+    python3 -m pip install -U pip setuptools wheel
+else 
+    echo "setuptools and wheel, pip are already installed."
+fi
+
+# Check if yt-dlp is installed
+#TODO: Move this line (export path) outside func and check if this already exists in ~/.zshrc, if it doesn't then add it
+if ! pip3 freeze | grep -q yt-dlp 
+then
+    # If not, install them
+    echo "yt-dlp has not been found, installing..."
+    python3 -m pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
+    export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc
+else
+    echo "yt-dlp has already been installed."
+fi
+
+
 #Set the YouTube channel URL
 
 channel_url="https://www.youtube.com/playlist?list=PLKm-SN1_VQ8VOpmmI26BdiTQ61cR0vH-6"
