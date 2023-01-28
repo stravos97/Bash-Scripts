@@ -83,7 +83,7 @@ for file in $dir_name/*; do
     if [[ $file == *"opus"* ]]; then
         title=$(ffprobe -loglevel error -show_entries format_tags=title -of default=noprint_wrappers=1:nokey=1 "$file")
         artist=$(ffprobe -loglevel error -show_entries format_tags=artist -of default=noprint_wrappers=1:nokey=1 "$file")
-        ffmpeg -i "$file" -vn -acodec opus -b:a 320k -ar 44100 -y "${title} - ${artist}.opus"
+        ffmpeg -strict -2 -i "$file" -vn -acodec opus -b:a 320k -ar 44100 -y "${title} - ${artist}.opus"
     elif [[ $file == *"webp"* ]]; then
 	 ffmpeg -i "$file" -q:v 1 -bsf:v mjpeg2jpeg "${file%.webp}.jpg"
     fi
