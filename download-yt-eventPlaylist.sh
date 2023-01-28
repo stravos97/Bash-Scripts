@@ -39,6 +39,16 @@ else
     echo "yt-dlp has already been installed."
 fi
 
+# Check if the line exists in .zshrc
+# Once complete remove from download yt-dl function
+#if ! grep -q "export PATH='/home/$USER/.local/bin:$PATH'" ~/.zshrc; then
+  # If not, add it to the bottom of the file
+#  echo "export PATH='/home/$USER/.local/bin:$PATH'" >> ~/.zshrc
+#  echo "Added the line to ~/.zshrc"
+#else
+#  echo "The line is already present in ~/.zshrc"
+#fi
+
 
 #Set the YouTube channel URL
 
