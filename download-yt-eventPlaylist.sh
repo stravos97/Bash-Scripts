@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Note this script has a dependency of zsh being your shell. If it's not modify this line "export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc" to point to your bashrc. Zsh can also be installed using the zsh-setup.sh script
+
+
 # Check if Python 3 is installed
 if ! command -v python3 &> /dev/null 
 then
