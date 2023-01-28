@@ -4,6 +4,8 @@
 
 sudo apt-get update
 
+# Create a log file to store the date, time, and error message
+LOG_FILE=yt_dl_error.txt
 
 # Function to check and install packages using apt
 install_apt_package() {
@@ -11,7 +13,7 @@ install_apt_package() {
     if [ $(dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
         echo "$package is not found, installing..."
         if ! sudo apt-get install -y "$package"; then
-            echo "Error: Failed to install $package"
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Error: Failed to install $package" | tee -a $LOG_FILE
             exit 1
         fi
     else
@@ -25,7 +27,7 @@ install_pip3_package() {
     if ! pip3 freeze | grep -q "$package"; then
         echo "$package is not found, installing..."
         if ! python3 -m pip install -U "$package"; then
-            echo "Error: Failed to install $package"
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Error: Failed to install $package" | tee -a $LOG_FILE
             exit 1
         fi
     else
@@ -123,6 +125,6 @@ for file in $dir_name/*; do
     fi
 done
 
-echo "All playlists have been downloaded and converted to audio-only files."
+echo "$(date +'%Y-%m-%d %H:%M:%S') All playlists have been downloaded and converted to audio-only files." | tee -a $LOG_FILE
 
 #script should only download from event etc playlist
