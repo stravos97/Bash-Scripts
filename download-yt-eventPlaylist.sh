@@ -2,13 +2,13 @@
 
 #Note this script has a dependency of zsh being your shell. If it's not modify this line "export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc" to point to your bashrc. Zsh can also be installed using the zsh-setup.sh script
 
+sudo apt-get update
 
 # Check if Python 3 is installed
 if ! command -v python3 &> /dev/null 
 then
     # If not, install it
     echo "Python3 is not found, installing..."
-    sudo apt-get update
     sudo apt-get install -y python3.11
 fi
 
@@ -21,13 +21,13 @@ then
 fi
 
 # Check if pip setuptools wheel are installed
-if ! pip3 freeze | grep -q setuptools || ! pip3 freeze | grep -q wheel || ! pip3 pip | grep -q pip 
+if ! pip3 freeze | grep -q setuptools || ! pip3 freeze | grep -q wheel || ! pip3 freeze | grep -q pip || ! pip3 freeze | grep -q pyxattr
 then
     # If not, install them
-    echo "setuptools and wheel, pip are not found, installing..."
-    python3 -m pip install -U pip setuptools wheel
+    echo "setuptools and wheel, pip, pyxattr are not found, installing..."
+    python3 -m pip install -U pip setuptools wheel pyxattr
 else 
-    echo "setuptools and wheel, pip are already installed."
+    echo "setuptools and wheel, pip, pyxattr are already installed."
 fi
 
 # Check if yt-dlp is installed
@@ -40,6 +40,15 @@ then
     export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc
 else
     echo "yt-dlp has already been installed."
+fi
+
+# Check if ffmpeg is already installed (ffprobe is installed with ffmpeg)
+if ! command -v ffmpeg > /dev/null 2>&1; then
+  # If not, install it
+  sudo apt-get install -y ffmpeg
+  echo "ffmpeg has been installed."
+else
+  echo "ffmpeg is already installed."
 fi
 
 # Check if the line exists in .zshrc
@@ -83,4 +92,3 @@ done
 echo "All playlists have been downloaded and converted to audio-only files."
 
 #script should only download from event etc playlist
-#yr-dlp needs to be installed with pip and the cutting edge version needs to be used:
