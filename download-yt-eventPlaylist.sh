@@ -37,9 +37,16 @@ then
     # If not, install them
     echo "yt-dlp has not been found, installing..."
     python3 -m pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
-    export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc
 else
     echo "yt-dlp has already been installed."
+fi
+
+# Check if the path "/home/$USER/.local/bin" exists in the $PATH variable
+if [[ ":$PATH:" == *":/home/$USER/.local/bin:"* ]]; then
+    echo "The path /home/$USER/.local/bin exists in the \$PATH variable."
+else
+    echo "The path /home/$USER/.local/bin does not exist in the \$PATH variable. Adding it to your ~/.zshrc file..."
+    export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc
 fi
 
 # Check if ffmpeg is already installed (ffprobe is installed with ffmpeg)
@@ -50,17 +57,6 @@ if ! command -v ffmpeg > /dev/null 2>&1; then
 else
   echo "ffmpeg is already installed."
 fi
-
-# Check if the line exists in .zshrc
-# Once complete remove from download yt-dl function
-#if ! grep -q "export PATH='/home/$USER/.local/bin:$PATH'" ~/.zshrc; then
-  # If not, add it to the bottom of the file
-#  echo "export PATH='/home/$USER/.local/bin:$PATH'" >> ~/.zshrc
-#  echo "Added the line to ~/.zshrc"
-#else
-#  echo "The line is already present in ~/.zshrc"
-#fi
-
 
 #Set the YouTube channel URL
 
