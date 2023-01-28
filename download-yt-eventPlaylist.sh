@@ -4,34 +4,70 @@
 
 sudo apt-get update
 
+
+# Function to check and install packages using apt
+install_apt_package() {
+    local package=$1
+    if [ $(dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+        echo "$package is not found, installing..."
+        if ! sudo apt-get install -y "$package"; then
+            echo "Error: Failed to install $package"
+            exit 1
+        fi
+    else
+        echo "$package is already installed."
+    fi
+}
+
+# Function to check and install packages using pip3
+install_pip3_package() {
+    local package=$1
+    if ! pip3 freeze | grep -q "$package"; then
+        echo "$package is not found, installing..."
+        if ! python3 -m pip install -U "$package"; then
+            echo "Error: Failed to install $package"
+            exit 1
+        fi
+    else
+        echo "$package is already installed."
+    fi
+}
+
+install_apt_package python3
+install_apt_package python3-pip
+install_apt_package ffmpeg
+
+install_pip3_package wheel
+install_pip3_package pip
+install_pip3_package pyxattr
+
 # Check if Python 3 is installed
-if ! command -v python3 &> /dev/null 
-then
-    # If not, install it
-    echo "Python3 is not found, installing..."
-    sudo apt-get install -y python3.11
-fi
+#if ! command -v python3 &> /dev/null 
+#then
+#    # If not, install it
+#    echo "Python3 is not found, installing..."
+#    sudo apt-get install -y python3.11
+#fi
 
 # Check if pip is installed
-if ! command -v pip3 &> /dev/null 
-then
+#if ! command -v pip3 &> /dev/null 
+#then
     # If not, install it
-    echo "pip3 is not found, installing..."
-    sudo apt-get install -y python3-pip
-fi
+#    echo "pip3 is not found, installing..."
+#    sudo apt-get install -y python3-pip
+#fi
 
 # Check if pip setuptools wheel are installed
-if ! pip3 freeze | grep -q setuptools || ! pip3 freeze | grep -q wheel || ! pip3 freeze | grep -q pip || ! pip3 freeze | grep -q pyxattr
-then
-    # If not, install them
-    echo "setuptools and wheel, pip, pyxattr are not found, installing..."
-    python3 -m pip install -U pip setuptools wheel pyxattr
-else 
-    echo "setuptools and wheel, pip, pyxattr are already installed."
-fi
+#if ! pip3 freeze | grep -q setuptools || ! pip3 freeze | grep -q wheel || ! pip3 freeze | grep -q pip || ! pip3 freeze | grep -q pyxattr
+#then
+#    # If not, install them
+#    echo "setuptools and wheel, pip, pyxattr are not found, installing..."
+#    python3 -m pip install -U pip setuptools wheel pyxattr
+#else 
+#    echo "setuptools and wheel, pip, pyxattr are already installed."
+#fi
 
-# Check if yt-dlp is installed
-#TODO: Move this line (export path) outside func and check if this already exists in ~/.zshrc, if it doesn't then add it
+# Check if yt-dlp is installed. Not used other method as we need cutting edge version
 if ! pip3 freeze | grep -q yt-dlp 
 then
     # If not, install them
@@ -39,7 +75,18 @@ then
     python3 -m pip install --force-reinstall https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz
 else
     echo "yt-dlp has already been installed."
+    #Update the package
+    python3 -m pip install -U yt-dlp
 fi
+
+# Check if ffmpeg is already installed (ffprobe is installed with ffmpeg)
+#if ! command -v ffmpeg > /dev/null 2>&1; then
+#  # If not, install it
+#  sudo apt-get install -y ffmpeg
+#  echo "ffmpeg has been installed."
+#else
+#  echo "ffmpeg is already installed."
+#fi
 
 # Check if the path "/home/$USER/.local/bin" exists in the $PATH variable
 if [[ ":$PATH:" == *":/home/$USER/.local/bin:"* ]]; then
@@ -47,15 +94,6 @@ if [[ ":$PATH:" == *":/home/$USER/.local/bin:"* ]]; then
 else
     echo "The path /home/$USER/.local/bin does not exist in the \$PATH variable. Adding it to your ~/.zshrc file..."
     export PATH="/home/$USER/.local/bin:$PATH" >> ~/.zshrc
-fi
-
-# Check if ffmpeg is already installed (ffprobe is installed with ffmpeg)
-if ! command -v ffmpeg > /dev/null 2>&1; then
-  # If not, install it
-  sudo apt-get install -y ffmpeg
-  echo "ffmpeg has been installed."
-else
-  echo "ffmpeg is already installed."
 fi
 
 #Set the YouTube channel URL
