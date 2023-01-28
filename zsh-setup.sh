@@ -12,7 +12,15 @@ else
 fi
 
 # Make Zsh the default shell
-chsh -s $(which zsh)
+#chsh -s $(which zsh)
+
+# Make Zsh the default shell for all users
+if [ "$SHELL" != "/bin/zsh" ]; then
+    chsh -s $(which zsh)
+    echo "Zsh set as the default shell for all users"
+else
+    echo "Zsh is already set as the default shell for all users"
+fi
 
 # Check if Oh My Zsh is already installed
 if [ ! -d ~/.oh-my-zsh ]; then
@@ -41,28 +49,28 @@ else
 fi
 
 #Check if the zsh-completions plugin is already cloned
-if [ ! -d /.oh-my-zsh/custom/plugins/zsh-completions ]; then
+if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-completions ]; then
     git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
 else
     echo "zsh-completions plugin is already cloned or there is a seperate issue cloning the repo from that source"
 fi
 
 #Check if the zsh-autosuggestions plugin is already cloned
-if [ ! -d /.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
+if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 else
     echo "zsh-autosuggestions plugin is already cloned or there is a seperate issue cloning the repo from that source"
 fi
 
 #Check if the zsh-syntax-highlighting plugin is already cloned
-if [ ! -d /.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
+if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 else
     echo "zsh-syntax-highlighting plugin is already cloned or there is a seperate issue cloning the repo from that source"
 fi
 
 #Check if the zsh-history-substring-search plugin is already cloned
-if [ ! -d /.oh-my-zsh/custom/plugins/zsh-history-substring-search ]; then
+if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-history-substring-search ]; then
     git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
 else
     echo "zsh-history-substring-search plugin is already cloned or there is a seperate issue cloning the repo from that source"
