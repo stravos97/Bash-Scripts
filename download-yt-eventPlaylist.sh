@@ -38,6 +38,7 @@ install_pip3_package() {
 install_apt_package python3
 install_apt_package python3-pip
 install_apt_package ffmpeg
+install_apt_package aria2
 
 install_pip3_package wheel
 install_pip3_package pip
@@ -111,7 +112,7 @@ dir_name=$(echo $playlist)
 mkdir $dir_name
 #Download the videos in the playlist
 
-yt-dlp --format "(bestaudio[acodec^=opus]/bestaudio)/best" -o "$dir_name/%(title)s-%(uploader)s.%(ext)s" "$channel_url" --throttled-rate 100K --verbose --force-ipv4 --sleep-requests 1 --sleep-interval 5 --max-sleep-interval 30 --ignore-errors --download-archive archive.txt --no-post-overwrites --write-thumbnail --embed-thumbnail --extract-audio --add-metadata --parse-metadata "%(title)s:%(meta_title)s" --parse-metadata "%(artist)s:%(meta_artist)s" --check-formats --xattrs --concurrent-fragments 5
+yt-dlp --format "(bestaudio[acodec^=opus]/bestaudio)/best" -o "$dir_name/%(title)s-%(uploader)s.%(ext)s" "$channel_url" --throttled-rate 100K --verbose --force-ipv4 --sleep-requests 1 --sleep-interval 5 --downloader aria2c --max-sleep-interval 30 --ignore-errors --download-archive archive.txt --no-post-overwrites --write-thumbnail --embed-thumbnail --extract-audio --add-metadata --parse-metadata "%(title)s:%(meta_title)s" --parse-metadata "%(artist)s:%(meta_artist)s" --check-formats --xattrs --concurrent-fragments 5
 #Convert all videos in the directory to audio-only files
 
 #Convert all videos in the directory to audio-only files
