@@ -46,6 +46,7 @@ if [ -f ~/.zshrc ]; then
     fi
 else
     echo "~/.zshrc file does not exist. Please make sure it exists before running the script."
+    exit 1
 fi
 
 #Check if the zsh-completions plugin is already cloned
