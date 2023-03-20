@@ -434,7 +434,7 @@ mkdir $dir_name
 for video in ${videos[@]}
 do
   yt-dlp \
-    --format "ba/b" \
+    --format "ba" \
     --no-playlist \
     --throttled-rate 100K \
     --sleep-requests 1 \
