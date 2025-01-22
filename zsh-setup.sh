@@ -1,83 +1,135 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Update package list
-sudo apt-get update
+# Exit immediately on error, unset variables, and pipeline failure
+set -euo pipefail
 
-# Check if Zsh is already installed
-if ! command -v zsh >/dev/null 2>&1; then
-    # Install Zsh
-    sudo apt-get install zsh -y
-else
-    echo "Zsh is already installed"
-fi
+# Detect operating system
+OS="$(uname -s)"
+case "$OS" in
+    Linux*)     PLATFORM="linux";;
+    Darwin*)    PLATFORM="macos";;
+    *)          echo "Unsupported OS: $OS"; exit 1;;
+esac
 
-# Make Zsh the default shell
-#chsh -s $(which zsh)
-
-# Make Zsh the default shell for all users
-if [ "$SHELL" != "/bin/zsh" ]; then
-    chsh -s $(which zsh)
-    echo "Zsh set as the default shell for all users"
-else
-    echo "Zsh is already set as the default shell for all users"
-fi
-
-# Check if Oh My Zsh is already installed
-if [ ! -d ~/.oh-my-zsh ]; then
-    # Install Oh My Zsh
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-else
-    echo "Oh My Zsh is already installed"
-fi
-
-# Set Zsh as the default shell for the current user
-if ! grep -Fxq "exec zsh" ~/.bashrc; then
-    echo "exec zsh" >> ~/.bashrc
-else
-    echo "Zsh is already set as the default shell for the current user"
-fi
-
-# Check if .zshrc file exists
-if [ -f ~/.zshrc ]; then
-    # Check if the "plugins" line already exists in .zshrc
-    if grep -q "^plugins=" ~/.zshrc; then
-        # Replace the "plugins" line with the specified string
-        sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions colored-man-pages zsh-completions zsh-history-substring-search pass zsh-syntax-highlighting)/' ~/.zshrc
+# Package manager configuration
+if [[ "$PLATFORM" == "linux" ]]; then
+    PKG_UPDATE="sudo apt-get update -qq"
+    PKG_INSTALL="sudo apt-get install -y -qq"
+    ZSH_PACKAGE="zsh"
+elif [[ "$PLATFORM" == "macos" ]]; then
+    # Check for Homebrew
+    if ! command -v brew >/dev/null; then
+        echo "Homebrew required but not found. Please install first:"
+        echo "https://brew.sh/"
+        exit 1
     fi
-else
-    echo "~/.zshrc file does not exist. Please make sure it exists before running the script."
-    exit 1
+    PKG_UPDATE="brew update -q"
+    PKG_INSTALL="brew install -q"
+    ZSH_PACKAGE="zsh"
 fi
 
-#Check if the zsh-completions plugin is already cloned
-if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-completions ]; then
-    git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
-else
-    echo "zsh-completions plugin is already cloned or there is a seperate issue cloning the repo from that source"
+# Required command-line tools
+REQUIRED_CMDS=(curl git)
+MISSING_CMDS=()
+for cmd in "${REQUIRED_CMDS[@]}"; do
+    command -v "$cmd" >/dev/null || MISSING_CMDS+=("$cmd")
+done
+
+# Install missing dependencies
+if [[ ${#MISSING_CMDS[@]} -gt 0 ]]; then
+    echo "Installing missing dependencies: ${MISSING_CMDS[*]}..."
+    $PKG_UPDATE
+    $PKG_INSTALL "${MISSING_CMDS[@]}"
 fi
 
-#Check if the zsh-autosuggestions plugin is already cloned
-if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# Install Zsh if not present
+if ! command -v zsh >/dev/null; then
+    echo "Installing Zsh..."
+    $PKG_UPDATE
+    $PKG_INSTALL "$ZSH_PACKAGE"
 else
-    echo "zsh-autosuggestions plugin is already cloned or there is a seperate issue cloning the repo from that source"
+    echo "Zsh already installed at $(command -v zsh)"
 fi
 
-#Check if the zsh-syntax-highlighting plugin is already cloned
-if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-else
-    echo "zsh-syntax-highlighting plugin is already cloned or there is a seperate issue cloning the repo from that source"
+# Verify Zsh is in /etc/shells
+ZSH_PATH="$(command -v zsh)"
+if ! grep -qxF "$ZSH_PATH" /etc/shells; then
+    echo "Adding $ZSH_PATH to /etc/shells..."
+    echo "$ZSH_PATH" | sudo tee -a /etc/shells >/dev/null
 fi
 
-#Check if the zsh-history-substring-search plugin is already cloned
-if [ ! -d ~/.oh-my-zsh/custom/plugins/zsh-history-substring-search ]; then
-    git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
+# Set default shell
+if [[ "$SHELL" != "$ZSH_PATH" ]]; then
+    echo "Setting Zsh as default shell..."
+    sudo chsh -s "$ZSH_PATH" "$USER"
 else
-    echo "zsh-history-substring-search plugin is already cloned or there is a seperate issue cloning the repo from that source"
+    echo "Zsh already set as default shell"
 fi
 
-# Restart the terminal
-exec zsh
+# Install Oh My Zsh
+OMZ_DIR="${HOME}/.oh-my-zsh"
+if [[ ! -d "$OMZ_DIR" ]]; then
+    echo "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+    echo "Oh My Zsh already installed"
+fi
 
-source ~/.zshrc
+# Ensure .zshrc exists
+ZSHRC="${HOME}/.zshrc"
+if [[ ! -f "$ZSHRC" ]]; then
+    echo "Creating initial .zshrc..."
+    cp "$OMZ_DIR/templates/zshrc.zsh-template" "$ZSHRC"
+fi
+
+# Configure plugins
+PLUGINS=(git zsh-autosuggestions colored-man-pages zsh-completions zsh-history-substring-search pass)
+SYNTAX_HIGHLIGHTING="zsh-syntax-highlighting"
+
+echo "Configuring plugins in .zshrc..."
+awk -v plugins="${PLUGINS[*]}" -v syntax="$SYNTAX_HIGHLIGHTING" '
+    BEGIN { updated = 0 }
+    /^plugins=\(/ {
+        print "plugins=(" plugins " " syntax ")";
+        updated = 1;
+        next
+    }
+    { print }
+    END {
+        if (!updated) print "plugins=(" plugins " " syntax ")"
+    }' "$ZSHRC" > "${ZSHRC}.tmp" && mv "${ZSHRC}.tmp" "$ZSHRC"
+
+# Plugin installation function
+clone_plugin() {
+    local repo="$1"
+    local dest="$2"
+    
+    if [[ ! -d "$dest" ]]; then
+        echo "Cloning $repo..."
+        git clone --quiet --depth 1 "$repo" "$dest" || {
+            echo "Error cloning $repo" >&2
+            return 1
+        }
+    else
+        echo "Plugin exists: $(basename "$dest")"
+    fi
+}
+
+# Install plugins
+ZSH_CUSTOM="${ZSH_CUSTOM:-${OMZ_DIR}/custom}"
+declare -a PLUGIN_REPOS=(
+    "zsh-completions https://github.com/zsh-users/zsh-completions"
+    "zsh-autosuggestions https://github.com/zsh-users/zsh-autosuggestions"
+    "zsh-syntax-highlighting https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    "zsh-history-substring-search https://github.com/zsh-users/zsh-history-substring-search"
+)
+
+for plugin in "${PLUGIN_REPOS[@]}"; do
+    name="${plugin%% *}"
+    url="${plugin#* }"
+    clone_plugin "$url" "${ZSH_CUSTOM}/plugins/${name}"
+done
+
+# Final setup
+echo -e "\nSetup complete! Starting new Zsh session..."
+exec zsh -l
