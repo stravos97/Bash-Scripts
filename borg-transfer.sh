@@ -1,7 +1,7 @@
 #!/bin/bash
 # Interactive script to move Borg backup repositories from one PC to another
 # with extensive validation and safety checks
-# Author: Claude
+# Author: Haashim
 # Date: March 20, 2025
 
 set -e  # Exit immediately if any command fails
