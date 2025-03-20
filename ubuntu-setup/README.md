@@ -13,6 +13,7 @@ The Ubuntu System Setup is a modular, extensible tool designed to simplify and s
 - **Configurability**: Extensive configuration options via the central config file
 - **Flexibility**: Run individual modules or the complete setup process
 - **Cross-Environment Support**: Works on both server and desktop Ubuntu installations
+- **Shell Customization**: ZSH setup with Oh My Zsh, themes, and productivity-enhancing plugins
 
 ## Directory Structure
 
@@ -25,11 +26,12 @@ ubuntu-setup/
 │   ├── desktop_env.sh       # Desktop environment installation
 │   ├── remote_access.sh     # xRDP and remote access configuration
 │   ├── backup_tools.sh      # BorgBackup and Vorta installation
-│   └── system_update.sh     # System update and package management
+│   ├── system_update.sh     # System update and package management
+│   └── zsh_setup.sh         # ZSH shell installation and configuration
 ├── config/                  # Configuration files
 │   └── setup.conf           # Default configuration settings
-└── setup-modular-structure.sh # Helper script to set up the modular structure
 ```
+
 ## Installation
 
 ### Manual Installation
@@ -38,14 +40,14 @@ You can set up the structure manually:
 
 1. Create the directory structure:
     
-    
+
 ```bash
     `mkdir -p ubuntu-setup/modules ubuntu-setup/config`
 ```
-    
+
 2. Download the main script and modules:
     
-    
+
 ```bash
 # Download main script
 wget -O ubuntu-setup/ubuntu-setup.sh https://example.com/ubuntu-setup.sh
@@ -59,14 +61,13 @@ wget -O ubuntu-setup/modules/user_management.sh https://example.com/modules/user
 # Download configuration
 wget -O ubuntu-setup/config/setup.conf https://example.com/config/setup.conf
 ```
-    
+
 3. Make all scripts executable:
     
-    
+
 ```bash
     chmod +x ubuntu-setup/modules/*.sh
 ```
-    
 
 ## Getting Started
 
@@ -92,15 +93,19 @@ sudo ./ubuntu-setup.sh --module=module_name
 
 For example, to only set up SSH:
 
-
 ```bash
 sudo ./ubuntu-setup.sh --module=ssh_setup
+```
+
+Or to set up ZSH shell with Oh My Zsh:
+
+```bash
+sudo ./ubuntu-setup.sh --module=zsh_setup
 ```
 
 ### Non-Interactive Mode
 
 For automated deployments, you can run in non-interactive mode:
-
 
 ```bash
 sudo ./ubuntu-setup.sh --non-interactive --config=/path/to/custom-config.conf
@@ -120,12 +125,11 @@ The system is highly configurable through the `setup.conf` file located in the
 - **Remote Access**: xRDP, VNC, and firewall settings
 - **System Updates**: Automatic updates, scheduling, notifications
 - **Common Utilities**: Default packages to install
+- **ZSH Configuration**: Theme, plugins, and aliases
 
 ### Custom Configuration Files
 
 You can create custom configuration files for different deployment scenarios:
-
-
 
 ```bash
 cp ubuntu-setup/config/setup.conf ubuntu-setup/config/server-setup.conf
@@ -146,6 +150,7 @@ sudo ./ubuntu-setup.sh --config=config/server-setup.conf
 - **remote_access.sh**: Sets up xRDP and VNC for remote desktop access
 - **backup_tools.sh**: Installs and configures BorgBackup and Vorta
 - **system_update.sh**: Handles system updates and package management
+- **zsh_setup.sh**: Installs and configures ZSH with Oh My Zsh and plugins
 
 ### How Modules Work
 
@@ -163,15 +168,15 @@ You can create your own modules to extend the system:
 
 1. Create a new .sh file in the modules directory:
     
-    
+
 ```bash
 touch ubuntu-setup/modules/my_custom_module.sh
 chmod +x ubuntu-setup/modules/my_custom_module.sh
 ```
-    
+
 2. Use this template:
     
-    
+
 ```bash
 #!/bin/bash
 # my_custom_module.sh - Description of your module
@@ -203,7 +208,7 @@ my_custom_module() {
 
 # Additional helper functions as needed
 ```
-    
+
 3. Update the main script to recognize your module (optional)
 
 ## Advanced Usage
@@ -249,20 +254,19 @@ The system includes robust error handling:
 
 To set up a minimal Ubuntu server with SSH and automatic updates:
 
-
 ```bash
 sudo ./ubuntu-setup.sh --module=ssh_setup
 sudo ./ubuntu-setup.sh --module=system_update --non-interactive
+sudo ./ubuntu-setup.sh --module=zsh_setup
 ```
 
 ### Desktop Setup Example
 
 To set up a complete Ubuntu desktop with remote access:
 
-
 ```bash
 sudo ./ubuntu-setup.sh
-# Then select options 2 (Desktop Environment) and 3 (Remote Access) from the menu
+# Then select options 2 (Desktop Environment), 3 (Remote Access), and 4 (User Management) > 3 (Setup ZSH Shell) from the menu
 ```
 
 ### Automation Example
@@ -271,21 +275,20 @@ To automate deployment across multiple systems:
 
 1. Create a custom configuration file:
     
-    
+
 ```bash
 cp config/setup.conf config/automated.conf
 # Edit automated.conf with your settings
 ```
-    
+
 2. Create a deployment script:
     
-    
+
 ```bash
 #!/bin/bash
 cd /path/to/ubuntu-setup
 sudo ./ubuntu-setup.sh --non-interactive --config=config/automated.conf
 ```
-    
 
 ## Troubleshooting
 
@@ -304,7 +307,6 @@ sudo ./ubuntu-setup.sh --non-interactive --config=config/automated.conf
 ### Debug Mode
 
 To run in debug mode with detailed output:
-
 
 ```bash
 sudo bash -x ./ubuntu-setup.sh

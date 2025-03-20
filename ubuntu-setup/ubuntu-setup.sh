@@ -52,6 +52,7 @@ check_modules() {
         "remote_access.sh"
         "backup_tools.sh"
         "system_update.sh"
+        "zsh_setup.sh"
     )
     
     local missing_modules=()
@@ -286,7 +287,8 @@ run_setup_wizard() {
                 echo -e "${BLUE}=== User Management ===${NC}"
                 echo "1. Create New User"
                 echo "2. Setup SSH Key for Current User"
-                echo "3. Back to Main Menu"
+                echo "3. Setup ZSH Shell"
+                echo "4. Back to Main Menu"
                 
                 echo -n "Enter your choice (1-3): "
                 read -r user_choice
@@ -294,7 +296,8 @@ run_setup_wizard() {
                 case $user_choice in
                     1) create_new_user ;;
                     2) setup_current_user_ssh ;;
-                    3) continue ;;
+                    3) zsh_setup ;;
+                    4) continue ;;
                     *) echo -e "${RED}Invalid choice${NC}" ;;
                 esac
                 ;;
@@ -387,6 +390,11 @@ run_setup_wizard() {
                 
                 # Set up SSH key for current user
                 setup_current_user_ssh
+
+                # Set up ZSH if requested
+                if ask_yes_no "Would you like to set up ZSH shell with Oh My Zsh?"; then
+                    zsh_setup
+                fi
                 
                 # Install BorgBackup
                 if ask_yes_no "Would you like to install BorgBackup for backups?"; then
