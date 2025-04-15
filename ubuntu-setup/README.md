@@ -27,7 +27,8 @@ ubuntu-setup/
 │   ├── remote_access.sh     # xRDP and remote access configuration
 │   ├── backup_tools.sh      # BorgBackup and Vorta installation
 │   ├── system_update.sh     # System update and package management
-│   └── zsh_setup.sh         # ZSH shell installation and configuration
+│   ├── zsh_setup.sh         # ZSH shell installation and configuration
+│   └── samba_setup.sh       # Samba server installation and configuration
 ├── config/                  # Configuration files
 │   └── setup.conf           # Default configuration settings
 ```
@@ -151,6 +152,7 @@ sudo ./ubuntu-setup.sh --config=config/server-setup.conf
 - **backup_tools.sh**: Installs and configures BorgBackup and Vorta
 - **system_update.sh**: Handles system updates and package management
 - **zsh_setup.sh**: Installs and configures ZSH with Oh My Zsh and plugins
+- **samba_setup.sh**: Installs and configures the Samba server for file sharing
 
 ### How Modules Work
 

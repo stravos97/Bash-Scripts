@@ -53,6 +53,7 @@ check_modules() {
         "backup_tools.sh"
         "system_update.sh"
         "zsh_setup.sh"
+        "samba_setup.sh" # Added Samba module
     )
     
     local missing_modules=()
@@ -205,11 +206,12 @@ run_setup_wizard() {
         echo "3. Remote Access Setup (SSH, xRDP, VNC)"
         echo "4. User Management"
         echo "5. Backup Tools (BorgBackup, Vorta)"
-        echo "6. Maintenance and Utilities"
-        echo "7. Run Full Setup (Recommended for new systems)"
-        echo "8. Exit"
+        echo "6. Samba Server Setup" # Added Samba option
+        echo "7. Maintenance and Utilities" # Shifted option
+        echo "8. Run Full Setup (Recommended for new systems)" # Shifted option
+        echo "9. Exit" # Shifted option
         
-        echo -n "Enter your choice (1-8): "
+        echo -n "Enter your choice (1-9): " # Updated range
         read -r choice
         
         case $choice in
@@ -331,8 +333,13 @@ run_setup_wizard() {
                     *) echo -e "${RED}Invalid choice${NC}" ;;
                 esac
                 ;;
+
+            6) 
+                # Samba Setup
+                samba_setup
+                ;;
             
-            6)
+            7) # Shifted from 6
                 # Maintenance submenu
                 echo -e "${BLUE}=== Maintenance and Utilities ===${NC}"
                 echo "1. Clean System"
@@ -356,7 +363,7 @@ run_setup_wizard() {
                 esac
                 ;;
             
-            7)
+            8) # Shifted from 7
                 # Full Setup
                 print_section_header "Running Full System Setup"
                 
@@ -431,7 +438,7 @@ run_setup_wizard() {
                 echo -e "${GREEN}Full system setup complete!${NC}"
                 ;;
             
-            8)
+            9) # Shifted from 8
                 # Exit
                 echo -e "${GREEN}Thank you for using the Ubuntu System Setup script.${NC}"
                 echo -e "Log file available at: ${YELLOW}$LOG_FILE${NC}"
@@ -439,7 +446,7 @@ run_setup_wizard() {
                 ;;
             
             *)
-                echo -e "${RED}Invalid choice. Please enter a number between 1 and 8.${NC}"
+                echo -e "${RED}Invalid choice. Please enter a number between 1 and 9.${NC}" # Updated range
                 ;;
         esac
     done
@@ -539,6 +546,8 @@ if [ "$CREATE_STUBS" = true ]; then
         "remote_access.sh"
         "backup_tools.sh"
         "system_update.sh"
+        "zsh_setup.sh" # Added zsh_setup.sh here too
+        "samba_setup.sh" # Added samba_setup.sh here
     )
     create_module_stubs "${required_modules[@]}"
     exit 0
